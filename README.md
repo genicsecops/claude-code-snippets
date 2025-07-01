@@ -16,11 +16,19 @@ Performs thorough, professional code reviews across repositories with focus on s
 
 Enforces strict Test-Driven Development practices with the classic Red-Green-Refactor cycle.
 
+## 📁 Directory Structure
+
+### `@claudefiles/` Directory
+This directory contains Claude-specific configuration files and user guidelines:
+
+- **`CLAUDE_USER.md`** - Global development principles and coding guidelines that help maintain consistent, high-quality code across all projects. These principles emphasize simplicity, maintainability, and clear communication.
+
 ## 🚀 How to Use
 
 1. Copy the content from any command file in the `.claude/commands` directory
 2. run with e.g. `/approval-mode`
-3. Enjoy enhanced development workflows!
+3. For global settings, place `CLAUDE_USER.md` content in your `~/.claude/CLAUDE.md` file
+4. Enjoy enhanced development workflows!
 
 ## 🤝 Contributing
 

@@ -1,0 +1,31 @@
+# Claude Code Snippets 🤖
+
+A collection of powerful command snippets and workflows for Claude Code to supercharge your development process. These snippets help you work more efficiently with Claude by establishing clear patterns, workflows, and guardrails.
+
+## 📋 Available Commands
+
+### `/approval-mode` - Controlled Development Workflow
+
+Activates a controlled development mode where Claude requests approval before making major changes. Perfect for production code or when you want to maintain tight control over the development process.
+
+### `/review` - Comprehensive Code Review
+
+Performs thorough, professional code reviews across repositories with focus on security, architecture, and code quality.
+
+### `/tdd` - Pure Test-Driven Development
+
+Enforces strict Test-Driven Development practices with the classic Red-Green-Refactor cycle.
+
+## 🚀 How to Use
+
+1. Copy the content from any command file in the `.claude/commands` directory
+2. run with e.g. `/approval-mode`
+3. Enjoy enhanced development workflows!
+
+## 🤝 Contributing
+
+Found these snippets helpful? Star the repo and watch for updates! Have ideas for new snippets? Feel free to open an issue or submit a pull request.
+
+## 📄 License
+
+MIT License - feel free to use these snippets in your own projects and share with your team.

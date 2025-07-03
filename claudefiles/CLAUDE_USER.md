@@ -35,3 +35,11 @@
 - Code should be understandable by junior developers
 - Clear naming conventions over clever abbreviations
 - Explicit logic over implicit behaviors
+
+### Testing Principles
+
+- **Test behavior, not implementation**: Tests describe WHAT the system does (user outcomes), never HOW it works internally. Test only through public APIs.
+- **No implementation details**: Never test private methods, internal state, or that specific methods were called. Tests should survive refactoring.
+- **Business-focused test names**: `"should apply discount for premium customers"` not `"should call calculateDiscount method"`
+- **Minimal test-driven code**: Write only enough production code to make the current failing test pass. No anticipatory features.
+- **Tests as living documentation**: Each test should clearly communicate a business requirement that non-developers can understand.

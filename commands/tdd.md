@@ -1,120 +1,180 @@
-# Start Pure TDD Mode
+# Pure TDD Mode - Behavior-Driven Testing Only
 
-**ACTIVATE TDD MODE**: Follow Test-Driven Development strictly. This is the core practice.
+**ACTIVATE STRICT TDD MODE**: Test-Driven Development with exclusive focus on BEHAVIOR, never implementation.
 
-## FUNDAMENTAL RULE
+## 🎯 CORE PRINCIPLE: TEST BEHAVIOR, NOT IMPLEMENTATION
 
-**NO PRODUCTION CODE WITHOUT A FAILING TEST.** Every line of production code must be written in response to a failing test.
+**Every test must describe WHAT the system does, not HOW it does it.**
 
-## STRICT RED-GREEN-REFACTOR CYCLE
-
-### 🔴 RED Phase - Write Failing Test
-
-1. Write ONE test for desired behavior
-2. Test must fail for the RIGHT reason
-3. **STOP** - No production code until test fails
-
-### 🟢 GREEN Phase - Make Test Pass  
-
-1. Write MINIMUM code to make test pass
-2. Resist urge to write more than needed
-3. **STOP** - Assess refactoring next
-
-### 🔄 REFACTOR Phase - Assess & Improve
-
-1. **ALWAYS ASSESS**: Would refactoring improve the code?
-2. If YES: Refactor while keeping tests green
-3. If NO: Move to next test
-4. All tests must still pass after refactoring
-
-## KEY TDD PRINCIPLES
-
-### Test Behavior, Not Implementation
-
-- Test through **public functions only** (exported functions)
-- Never test internal/private functions directly
-- Focus on "what it does", not "how it does it"
+### ✅ GOOD: Testing Behavior (Business Value)
 
 ```typescript
-// ✅ Test behavior through public API
-expect(processOrder(order)).toEqual({ status: 'completed', total: 100 });
-
-// ❌ Don't test internals
-expect(calculateTax).toHaveBeenCalled();
-```
-
-### Minimal Implementation
-
-- Write only enough code to pass current test
-- Don't anticipate future requirements
-- Don't add features "while you're there"
-
-### Refactoring Assessment
-
-- Only refactor if it genuinely improves the code
-- If code is already clean → don't refactor
-- Common improvements: unclear names, duplication, complex logic
-
-## TDD VIOLATIONS TO PREVENT
-
-**NEVER:**
-
-- Write production code before failing test
-- Write multiple tests before making first one pass  
-- Skip the refactor assessment step
-- Test implementation details instead of behavior
-- Add functionality without a test driving it
-
-## TDD WORKFLOW
-
-### Before Writing Production Code
-
-```
-🛑 CHECK: Is there a failing test demanding this code?
-If NO → Write the test first
-If YES → Write minimal implementation
-```
-
-### After Test Passes
-
-```
-🔄 ASSESS: Would refactoring add value?
-If YES → Refactor, verify tests pass
-If NO → Move to next test
-```
-
-### Progress Format
-
-```
-🔴 RED: [Test description] - FAILING
-🟢 GREEN: [Minimal implementation] - PASSING  
-🔄 REFACTOR: [Assessment] - [Action taken]
-```
-
-## EXAMPLE TDD CYCLE
-
-```typescript
-// 🔴 RED: Write failing test
-it("should calculate order total with tax", () => {
-  const order = { items: [{ price: 100 }], taxRate: 0.1 };
-  expect(calculateTotal(order)).toBe(110);
+// Tests describe user-visible outcomes
+it("should apply 10% discount for orders over $100", () => {
+  const order = createOrder([{ price: 150 }]);
+  expect(order.getTotal()).toBe(135); // 150 - 15 (10%)
 });
-// FAILS - calculateTotal doesn't exist
 
-// 🟢 GREEN: Minimal implementation
-const calculateTotal = (order) => {
-  const subtotal = order.items.reduce((sum, item) => sum + item.price, 0);
-  return subtotal + (subtotal * order.taxRate);
-};
+it("should send welcome email when user registers", () => {
+  const emailService = mockEmailService();
+  const user = registerUser("john@example.com", emailService);
+  expect(emailService.sentEmails).toContainEqual({
+    to: "john@example.com",
+    subject: "Welcome!"
+  });
+});
+```
+
+### ❌ BAD: Testing Implementation
+
+```typescript
+// Tests that know too much about internals
+it("should call calculateDiscount method", () => {
+  const spy = jest.spyOn(order, '_calculateDiscount');
+  order.getTotal();
+  expect(spy).toHaveBeenCalled(); // ❌ Testing HOW, not WHAT
+});
+
+it("should set internal state to processed", () => {
+  order.process();
+  expect(order._state).toBe('processed'); // ❌ Testing private state
+});
+```
+
+## 🔄 STRICT RED-GREEN-REFACTOR CYCLE
+
+### 🔴 RED Phase - Write ONE Failing Behavior Test
+
+1. **ASK**: "What should the system DO from the user's perspective?"
+2. Write test describing desired OUTCOME
+3. Test must fail because feature doesn't exist
+4. **STOP** - No code until test fails
+
+### 🟢 GREEN Phase - Minimal Implementation
+
+1. Write ONLY enough code to make test pass
+2. Implementation details are irrelevant - only the test passing matters
+3. **STOP** - Test passes? Move to refactor assessment
+
+### 🔄 REFACTOR Phase - Improve Without Changing Behavior
+
+1. **ASSESS**: Can code be clearer/simpler while maintaining same behavior?
+2. Refactor internals freely - tests ensure behavior unchanged
+3. All tests must remain green
+
+## 🚫 TDD VIOLATIONS - NEVER DO THIS
+
+- Write code without a failing test
+- Test private methods, internal state, or implementation details
+- Test that specific methods were called (unless it's an external dependency)
+- Write tests that break when refactoring (brittle tests)
+- Test getters/setters directly without business context
+
+## 📋 BEHAVIOR TEST CHECKLIST
+
+Before writing any test, ask:
+
+- [ ] Does this test describe a business requirement?
+- [ ] Could I change the implementation without breaking this test?
+- [ ] Is this testing through the public API only?
+- [ ] Would a non-developer understand what this test verifies?
+- [ ] Does the test name describe a user-visible behavior?
+
+## 🎯 BEHAVIOR TESTING PATTERNS
+
+### Testing Through Public API Only
+
+```typescript
+// ✅ GOOD: Test the result, not the process
+class ShoppingCart {
+  addItem(item: Item): void
+  getTotal(): number
+  applyDiscount(code: string): void
+}
+
+// Test ONLY these public methods and their outcomes
+```
+
+### Testing Side Effects
+
+```typescript
+// ✅ GOOD: Verify observable side effects
+it("should notify inventory when order is placed", () => {
+  const inventory = mockInventory();
+  const order = new Order(inventory);
+  
+  order.place();
+  
+  expect(inventory.notifications).toContain({
+    type: 'ORDER_PLACED',
+    items: order.items
+  });
+});
+```
+
+### Testing Error Behavior
+
+```typescript
+// ✅ GOOD: Test how system behaves with invalid input
+it("should reject orders with invalid credit card", () => {
+  const order = createOrder();
+  
+  expect(() => order.pay(invalidCard)).toThrow("Invalid payment method");
+});
+```
+
+## 📝 PROGRESS TRACKING FORMAT
+
+```
+🔴 RED: [Business behavior description] - FAILING
+   Example: "Customer receives 10% discount on first order"
+   
+🟢 GREEN: [What was implemented] - PASSING
+   Example: "Added discount calculation to checkout"
+   
+🔄 REFACTOR: [Internal improvements] - STILL PASSING
+   Example: "Extracted discount logic to strategy pattern"
+```
+
+## 🎬 EXAMPLE: Full TDD Cycle for Business Feature
+
+```typescript
+// Business Requirement: "Premium customers get free shipping on all orders"
+
+// 🔴 RED: Test the business rule
+it("should provide free shipping for premium customers", () => {
+  const customer = new Customer({ type: 'premium' });
+  const order = new Order({ customer, items: [{ price: 10 }] });
+  
+  expect(order.getShippingCost()).toBe(0);
+});
+// FAILS: getShippingCost returns undefined
+
+// 🟢 GREEN: Simplest implementation
+class Order {
+  getShippingCost() {
+    return this.customer.type === 'premium' ? 0 : 5;
+  }
+}
 // PASSES
 
-// 🔄 REFACTOR: Assess
-// Code is clear and simple - no refactoring needed
-// Move to next test
+// 🔄 REFACTOR: Better structure (tests still pass)
+class Order {
+  getShippingCost() {
+    return this.shippingStrategy.calculate(this);
+  }
+}
+// Tests unchanged and still passing!
 ```
 
-## SESSION COMPACT/SUMMARY
+## ⚡ QUICK REFERENCE
 
-When creating a summary for a new session, **include this TDD mode** so strict TDD continues.
+**Before EVERY line of code ask:**
 
-**Confirm you understand and have activated pure TDD mode.**
+1. Is there a failing test describing the BEHAVIOR I'm implementing?
+2. Am I testing WHAT the system does, not HOW it works?
+3. Will this test survive refactoring?
+
+**Remember**: Tests are specifications of behavior, not implementation validators.
+
+**Confirm activation of Pure TDD Mode with Behavior-First Testing.**
